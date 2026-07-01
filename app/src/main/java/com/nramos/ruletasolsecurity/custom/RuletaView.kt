@@ -4,17 +4,23 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
 import android.content.Context
-import android.graphics.*
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.View
 import android.view.animation.DecelerateInterpolator
-import com.nramos.ruletasolsecurity.R
 import com.nramos.ruletasolsecurity.data.Category
 import com.nramos.ruletasolsecurity.data.QuestionData
 import kotlin.math.cos
 import kotlin.math.min
 import kotlin.math.sin
 
+/**
+ * Vista personalizada que dibuja la ruleta de categorías.
+ * Estilo gráfico circular limpio, sin triángulos en el centro.
+ */
 class RuletaView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -24,17 +30,52 @@ class RuletaView @JvmOverloads constructor(
     companion object {
         private const val PI = Math.PI.toFloat()
         private const val TWO_PI = PI * 2
+
+        // Colores de sector
+        private val SECTOR_COLORS = listOf(
+            Color.parseColor("#FAB323"), // A - amarillo dorado
+            Color.parseColor("#9BC1BC"), // B - azul oscuro
+            Color.parseColor("#1A2170")  // C - azul medio
+        )
+
+        private val SECTOR_LETTERS = listOf("A", "B", "C")
     }
 
     private var categories: List<Category> = emptyList()
     private var currentRotation = 0f
-    private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
-    private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+
+    private val sectorPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.FILL
+    }
+
+    private val borderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.STROKE
+        color = Color.parseColor("#FFFFFF")
+        strokeWidth = 2f
+    }
+
+    private val ringPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.STROKE
+        color = Color.parseColor("#060A51")
+    }
+
+    private val letterPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.WHITE
-        textSize = 40f
         textAlign = Paint.Align.CENTER
         isFakeBoldText = true
     }
+
+    private val centerPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.FILL
+        color = Color.parseColor("#FFFFFF")
+    }
+
+    private val centerRingPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.STROKE
+        color = Color.parseColor("#FAB323")
+        strokeWidth = 3f
+    }
+
     private var selectedIndex = 0
     private var onCategorySelected: ((Category) -> Unit)? = null
 
@@ -43,14 +84,13 @@ class RuletaView @JvmOverloads constructor(
 
     init {
         categories = QuestionData.getCategories()
-        // Aplicar sombra a la ruleta
         setLayerType(LAYER_TYPE_SOFTWARE, null)
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
-        // Actualizar tamaño de texto según el tamaño de la vista
-        textPaint.textSize = width * 0.08f
+        letterPaint.textSize = width * 0.16f
+        ringPaint.strokeWidth = width * 0.02f
     }
 
     fun setOnCategorySelectedListener(listener: (Category) -> Unit) {
@@ -61,7 +101,6 @@ class RuletaView @JvmOverloads constructor(
         if (isSpinning || categories.isEmpty()) return
         isSpinning = true
 
-        // Ángulo objetivo: mínimo 3 vueltas completas + un ángulo aleatorio
         val extraAngle = (Math.random() * TWO_PI).toFloat()
         val targetRotation = currentRotation + (TWO_PI * 4) + extraAngle
 
@@ -96,9 +135,7 @@ class RuletaView @JvmOverloads constructor(
     fun isSpinning(): Boolean = isSpinning
 
     private fun getSelectedCategoryIndex(): Int {
-        // El indicador está en la parte superior (ángulo -PI/2)
-        // La rotación actual rota todo, así que calculamos qué sector está en la parte superior
-        val indicatorAngle = -PI / 2 // Apunta hacia arriba
+        val indicatorAngle = -PI / 2
         val angle = (indicatorAngle - currentRotation) % TWO_PI
         val normalizedAngle = if (angle < 0) angle + TWO_PI else angle
         val sectorAngle = TWO_PI / categories.size
@@ -110,119 +147,103 @@ class RuletaView @JvmOverloads constructor(
 
         val centerX = width / 2f
         val centerY = height / 2f
-        val radius = (min(width, height) / 2f) * 0.9f
+        val radius = (min(width, height) / 2f) * 0.88f
+
+        // Espacio para el centro limpio (20% del radio)
+        val innerRadius = radius * 0.28f
 
         if (categories.isEmpty()) {
             drawEmptyState(canvas, centerX, centerY)
             return
         }
 
+        // Sombra suave
+        sectorPaint.setShadowLayer(18f, 0f, 8f, Color.parseColor("#33000000"))
+
         val sectorAngle = TWO_PI / categories.size
-        val colors = listOf(
-            Color.parseColor("#FAB323"),  // Amarillo
-            Color.parseColor("#060A51"),  // Azul oscuro
-            Color.parseColor("#FAB323")   // Amarillo
+
+        // Rectángulo para los arcos (desde innerRadius hasta radius)
+        val rectF = RectF(
+            centerX - radius,
+            centerY - radius,
+            centerX + radius,
+            centerY + radius
         )
 
-        // Dibujar los sectores
+        val innerRectF = RectF(
+            centerX - innerRadius,
+            centerY - innerRadius,
+            centerX + innerRadius,
+            centerY + innerRadius
+        )
+
         for (i in categories.indices) {
-            val startAngle = i * sectorAngle + currentRotation
-            val endAngle = startAngle + sectorAngle
+            val startAngle = Math.toDegrees((i * sectorAngle + currentRotation).toDouble()).toFloat()
+            val sweepAngle = Math.toDegrees(sectorAngle.toDouble()).toFloat()
 
-            // Crear path para el sector
-            val path = Path()
-            path.moveTo(centerX, centerY)
-            val startX = centerX + radius * cos(startAngle)
-            val startY = centerY + radius * sin(startAngle)
-            val endX = centerX + radius * cos(endAngle)
-            val endY = centerY + radius * sin(endAngle)
+            // Dibujar el sector como un arco (sin llegar al centro)
+            sectorPaint.color = SECTOR_COLORS[i % SECTOR_COLORS.size]
+            canvas.drawArc(rectF, startAngle, sweepAngle, true, sectorPaint)
 
-            path.lineTo(startX, startY)
-            path.addArc(
-                centerX - radius,
-                centerY - radius,
-                centerX + radius,
-                centerY + radius,
-                -Math.toDegrees(startAngle.toDouble()).toFloat(),
-                Math.toDegrees(sectorAngle.toDouble()).toFloat()
-            )
-            path.close()
+            // Dibujar un círculo interior blanco para ocultar las puntas
+            // Esto se hace después para que el centro quede limpio
+        }
 
-            // Color del sector
-            paint.color = colors[i % colors.size]
-            if (i == 1) {
-                paint.color = Color.parseColor("#060A51")
-            }
-            canvas.drawPath(path, paint)
+        // Quitar la sombra para el resto de dibujos
+        sectorPaint.clearShadowLayer()
 
-            // Dibujar texto en el sector
-            val midAngle = startAngle + sectorAngle / 2
-            val textRadius = radius * 0.6f
+        // Dibujar separadores blancos entre sectores (líneas desde innerRadius hasta radius)
+        for (i in categories.indices) {
+            val angle = i * sectorAngle + currentRotation
+            val startX = centerX + innerRadius * cos(angle)
+            val startY = centerY + innerRadius * sin(angle)
+            val endX = centerX + radius * cos(angle)
+            val endY = centerY + radius * sin(angle)
+            canvas.drawLine(startX, startY, endX, endY, borderPaint)
+        }
+
+        // Dibujar letras en cada sector
+        for (i in categories.indices) {
+            val midAngle = (i * sectorAngle + currentRotation) + sectorAngle / 2
+            val textRadius = (innerRadius + radius) / 2
             val textX = centerX + textRadius * cos(midAngle)
             val textY = centerY + textRadius * sin(midAngle)
 
-            // Rotar canvas para texto legible
-            canvas.save()
-            canvas.rotate(
-                Math.toDegrees(midAngle.toDouble()).toFloat() + 90,
+            val letter = SECTOR_LETTERS.getOrElse(i) { (i + 1).toString() }
+
+            // Color de la letra según el fondo
+            letterPaint.color = if (i == 0) {
+                Color.parseColor("#060A51") // Amarillo → texto oscuro
+            } else {
+                Color.WHITE // Azul → texto blanco
+            }
+
+            canvas.drawText(
+                letter,
                 textX,
-                textY
+                textY + (letterPaint.textSize / 3f),
+                letterPaint
             )
-            textPaint.color = if (i == 1) Color.WHITE else Color.parseColor("#060A51")
-            val text = if (categories[i].name.length > 20) {
-                categories[i].name.substring(0, 18) + "..."
-            } else {
-                categories[i].name
-            }
-            // Dividir en líneas si es necesario
-            val lines = text.split(" ")
-            if (lines.size > 1) {
-                val lineHeight = textPaint.textSize
-                for (j in lines.indices) {
-                    canvas.drawText(
-                        lines[j],
-                        textX,
-                        textY - (lineHeight * (lines.size - 1) / 2) + (j * lineHeight),
-                        textPaint
-                    )
-                }
-            } else {
-                canvas.drawText(text, textX, textY + textPaint.textSize / 3, textPaint)
-            }
-            canvas.restore()
         }
 
-        // Borde exterior
-        paint.style = Paint.Style.STROKE
-        paint.strokeWidth = 4f
-        paint.color = Color.parseColor("#060A51")
-        canvas.drawCircle(centerX, centerY, radius, paint)
-        paint.style = Paint.Style.FILL
+        // 🔹 CENTRO LIMPIO - SIN TRIÁNGULOS 🔹
+        // Dibujar un círculo blanco en el centro que cubre todas las puntas
+        canvas.drawCircle(centerX, centerY, innerRadius, centerPaint)
 
-        // Dibujar divisiones entre sectores
-        paint.style = Paint.Style.STROKE
-        paint.strokeWidth = 2f
-        paint.color = Color.WHITE
-        for (i in categories.indices) {
-            val angle = i * sectorAngle + currentRotation
-            val x = centerX + radius * cos(angle)
-            val y = centerY + radius * sin(angle)
-            canvas.drawLine(centerX, centerY, x, y, paint)
-        }
-        paint.style = Paint.Style.FILL
+        // Anillo interior decorativo
+        canvas.drawCircle(centerX, centerY, innerRadius, centerRingPaint)
+
+        // Anillo exterior
+        canvas.drawCircle(centerX, centerY, radius, ringPaint)
     }
 
     private fun drawEmptyState(canvas: Canvas, centerX: Float, centerY: Float) {
-        paint.color = Color.LTGRAY
-        paint.style = Paint.Style.FILL
-        canvas.drawCircle(centerX, centerY, min(width, height) / 3f, paint)
-        paint.color = Color.GRAY
-        paint.style = Paint.Style.STROKE
-        paint.strokeWidth = 2f
-        canvas.drawCircle(centerX, centerY, min(width, height) / 3f, paint)
-        textPaint.textSize = 24f
-        textPaint.color = Color.GRAY
-        canvas.drawText("Sin datos", centerX, centerY + 8f, textPaint)
+        sectorPaint.color = Color.LTGRAY
+        sectorPaint.style = Paint.Style.FILL
+        canvas.drawCircle(centerX, centerY, min(width, height) / 3f, sectorPaint)
+        letterPaint.textSize = 24f
+        letterPaint.color = Color.GRAY
+        canvas.drawText("Sin datos", centerX, centerY + 8f, letterPaint)
     }
 
     fun getSelectedCategory(): Category? {

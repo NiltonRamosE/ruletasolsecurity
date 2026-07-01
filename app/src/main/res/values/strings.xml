@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- MainActivity -->
     <string name="app_name">Ruleta Sol Security</string>
     <string name="badge_label">¡DE LA MANO CON TASA!</string>
     <string name="title_line_1">RULETA</string>
@@ -8,11 +9,21 @@
     <string name="btn_comenzar">COMENZAR</string>
     <string name="logo_content_description">Logo de Sol Security</string>
 
+    <!-- GameActivity: pantalla de la ruleta -->
+    <string name="wheel_title">¿Qué categoría te toca?</string>
+    <string name="wheel_subtitle">Gira la ruleta y responde la pregunta</string>
+    <string name="legend_a">A — Conocimiento de SOL SECURITY</string>
+    <string name="legend_b">B — Seguridad en la Cadena Logística</string>
+    <string name="legend_c">C — Prevención frente a la delincuencia</string>
     <string name="btn_girar">GIRAR</string>
+    <string name="girando">GIRANDO…</string>
+    <string name="indicator_description">Indicador de la ruleta</string>
+
+    <!-- GameActivity: pantalla de pregunta -->
+    <string name="close_description">Volver a la ruleta</string>
     <string name="btn_verificar">VERIFICAR</string>
     <string name="btn_correcto">✓ CORRECTO</string>
     <string name="btn_incorrecto">✗ INCORRECTO</string>
-    <string name="btn_reiniciar">🔄 REINICIAR</string>
-    <string name="indicator_description">Indicador de la ruleta</string>
-    <string name="girando">GIRANDO...</string>
+    <string name="btn_reiniciar">GIRAR DE NUEVO</string>
+    <string name="free_response_hint">Responde en voz alta. Cuando estés listo, indica si la respuesta fue correcta o incorrecta.</string>
 </resources>

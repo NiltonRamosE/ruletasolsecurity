@@ -1,184 +1,408 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_primary">
 
-    <!-- Contenedor principal de la ruleta -->
-    <FrameLayout
-        android:id="@+id/ruletaContainer"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="24dp"
-        app:layout_constraintDimensionRatio="1:1"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintWidth_percent="0.85">
+    <!-- ======================================================= -->
+    <!-- SECCIÓN 1: RULETA (pantalla inicial)                     -->
+    <!-- ======================================================= -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/wheelSection"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-        <!-- Canvas para dibujar la ruleta -->
-        <com.nramos.ruletasolsecurity.custom.RuletaView
-            android:id="@+id/ruletaView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-        <!-- Indicador / flecha en la parte superior -->
-        <ImageView
-            android:id="@+id/ivIndicator"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_gravity="top|center_horizontal"
-            android:layout_marginTop="-12dp"
-            android:src="@drawable/ic_indicator"
-            android:contentDescription="@string/indicator_description" />
-
-        <!-- Centro de la ruleta (círculo decorativo) -->
-        <View
-            android:id="@+id/ruletaCenter"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_gravity="center"
-            android:background="@drawable/bg_ruleta_center"
-            android:elevation="4dp" />
-
-    </FrameLayout>
-
-    <!-- Botón GIRAR -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnGirar"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="48dp"
-        android:layout_marginEnd="48dp"
-        android:layout_marginTop="16dp"
-        android:backgroundTint="@color/brand_yellow"
-        android:elevation="8dp"
-        android:paddingVertical="16dp"
-        android:text="@string/btn_girar"
-        android:textAllCaps="true"
-        android:textColor="@color/brand_dark_blue"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        app:cornerRadius="30dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ruletaContainer" />
-
-    <!-- Card de la pregunta (se muestra después del giro) -->
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cardPregunta"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="24dp"
-        android:visibility="gone"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="8dp"
-        app:cardBackgroundColor="@color/white"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btnGirar">
-
-        <LinearLayout
-            android:layout_width="match_parent"
+        <!-- Título de la pantalla -->
+        <TextView
+            android:id="@+id/tvWheelTitle"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:gravity="center"
+            android:text="@string/wheel_title"
+            android:textColor="@color/text_title"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-black"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvWheelSubtitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:gravity="center"
+            android:text="@string/wheel_subtitle"
+            android:textColor="@color/text_subtitle"
+            android:textSize="13sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvWheelTitle" />
+
+        <!-- Contenedor principal de la ruleta -->
+        <FrameLayout
+            android:id="@+id/ruletaContainer"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="18dp"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvWheelSubtitle"
+            app:layout_constraintWidth_percent="0.72">
+
+            <!-- Canvas para dibujar la ruleta -->
+            <com.nramos.ruletasolsecurity.custom.RuletaView
+                android:id="@+id/ruletaView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <!-- Indicador pequeño y centrado, apuntando hacia la ruleta -->
+            <ImageView
+                android:id="@+id/ivIndicator"
+                android:layout_width="24dp"
+                android:layout_height="28dp"
+                android:layout_gravity="top|center_horizontal"
+                android:layout_marginTop="-6dp"
+                android:src="@drawable/ic_indicator"
+                android:contentDescription="@string/indicator_description" />
+
+            <!-- Centro de la ruleta (mini medalla decorativa) -->
+            <View
+                android:id="@+id/ruletaCenter"
+                android:layout_width="34dp"
+                android:layout_height="34dp"
+                android:layout_gravity="center"
+                android:background="@drawable/bg_ruleta_center"
+                android:elevation="4dp" />
+
+        </FrameLayout>
+
+        <!-- Leyenda: qué representa cada letra de la ruleta -->
+        <LinearLayout
+            android:id="@+id/legendCard"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="28dp"
+            android:layout_marginEnd="28dp"
+            android:background="@drawable/bg_legend_card"
             android:orientation="vertical"
-            android:padding="20dp">
+            android:padding="14dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ruletaContainer">
 
-            <!-- Categoría -->
-            <TextView
-                android:id="@+id/tvCategoria"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/brand_dark_blue"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:text="Categoría" />
-
-            <!-- Número de pregunta -->
-            <TextView
-                android:id="@+id/tvNumeroPregunta"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:textColor="@color/brand_yellow"
-                android:textSize="12sp"
-                android:text="Pregunta #1" />
-
-            <!-- Texto de la pregunta -->
-            <TextView
-                android:id="@+id/tvPregunta"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:textColor="@color/text_title"
-                android:textSize="16sp"
-                android:text="Texto de la pregunta" />
-
-            <!-- Opciones (para multiple choice) -->
+            <!-- Fila A -->
             <LinearLayout
-                android:id="@+id/llOpciones"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:orientation="vertical"
-                android:visibility="gone">
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-                <RadioGroup
-                    android:id="@+id/rgOpciones"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <!-- Se llenará dinámicamente -->
-                </RadioGroup>
+                <View
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:background="@drawable/bg_dot_circle"
+                    android:backgroundTint="@color/brand_yellow" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnVerificar"
-                    android:layout_width="match_parent"
+                <TextView
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:backgroundTint="@color/brand_dark_blue"
-                    android:text="@string/btn_verificar"
-                    android:textColor="@color/white"
-                    app:cornerRadius="8dp" />
+                    android:layout_marginStart="10dp"
+                    android:layout_weight="1"
+                    android:text="@string/legend_a"
+                    android:textColor="@color/text_title"
+                    android:textSize="12.5sp" />
             </LinearLayout>
 
-            <!-- Respuesta correcta / explicación -->
-            <TextView
-                android:id="@+id/tvRespuestaCorrecta"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:background="@color/success_green_light"
-                android:padding="12dp"
-                android:textColor="@color/success_green_dark"
-                android:textSize="14sp"
-                android:visibility="gone"
-                android:text="Respuesta correcta" />
-
-            <!-- Explicación -->
-            <TextView
-                android:id="@+id/tvExplicacion"
+            <!-- Fila B -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:background="@color/info_blue_light"
-                android:padding="12dp"
-                android:textColor="@color/info_blue_dark"
-                android:textSize="14sp"
-                android:visibility="gone"
-                android:text="Explicación" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <View
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:background="@drawable/bg_dot_circle"
+                    android:backgroundTint="@color/brand_dark_blue" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_weight="1"
+                    android:text="@string/legend_b"
+                    android:textColor="@color/text_title"
+                    android:textSize="12.5sp" />
+            </LinearLayout>
+
+            <!-- Fila C -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <View
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:background="@drawable/bg_dot_circle"
+                    android:backgroundTint="@color/brand_dark_blue_light" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_weight="1"
+                    android:text="@string/legend_c"
+                    android:textColor="@color/text_title"
+                    android:textSize="12.5sp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Botón GIRAR: forma pill con degradado, igual estilo que MainActivity -->
+        <LinearLayout
+            android:id="@+id/btnGirar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="48dp"
+            android:layout_marginEnd="48dp"
+            android:layout_marginTop="22dp"
+            android:layout_marginBottom="28dp"
+            android:background="@drawable/bg_button_comenzar_ripple"
+            android:clickable="true"
+            android:focusable="true"
+            android:elevation="10dp"
+            android:outlineProvider="bounds"
+            android:stateListAnimator="@null"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/legendCard"
+            app:layout_constraintVertical_bias="1">
+
+            <TextView
+                android:id="@+id/tvBtnGirarLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/btn_girar"
+                android:textColor="@color/button_text"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textAllCaps="true"
+                android:letterSpacing="0.06" />
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- ======================================================= -->
+    <!-- SECCIÓN 2: PREGUNTA A PANTALLA COMPLETA                  -->
+    <!-- ======================================================= -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/questionSection"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/background_primary"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <!-- Barra superior: cerrar + categoría -->
+        <ImageButton
+            android:id="@+id/btnClose"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="20dp"
+            android:background="@drawable/bg_close_button"
+            android:contentDescription="@string/close_description"
+            android:padding="10dp"
+            android:src="@drawable/ic_close"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvCategoria"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="20dp"
+            android:background="@drawable/bg_category_badge_solid"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="Categoría"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/btnClose"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/btnClose"
+            app:layout_constraintTop_toTopOf="@id/btnClose" />
+
+        <!-- Contenido de la pregunta: SCROLLABLE, entre la barra superior y la barra de acciones -->
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/scrollQuestion"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="20dp"
+            android:clipToPadding="false"
+            android:paddingBottom="16dp"
+            app:layout_constraintBottom_toTopOf="@id/bottomActionBar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btnClose">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingStart="24dp"
+                android:paddingEnd="24dp">
+
+                <!-- Número de pregunta -->
+                <TextView
+                    android:id="@+id/tvNumeroPregunta"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="18dp"
+                    android:text="Pregunta #1"
+                    android:textColor="@color/brand_yellow_dark"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.06" />
+
+                <!-- Texto de la pregunta -->
+                <TextView
+                    android:id="@+id/tvPregunta"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:lineSpacingExtra="4dp"
+                    android:text="Texto de la pregunta"
+                    android:textColor="@color/text_title"
+                    android:textSize="21sp"
+                    android:textStyle="bold" />
+
+                <!-- Opciones (multiple choice / verdadero-falso) -->
+                <LinearLayout
+                    android:id="@+id/llOpciones"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <RadioGroup
+                        android:id="@+id/rgOpciones"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:showDividers="middle"
+                        android:divider="@android:color/transparent"
+                        android:dividerPadding="10dp" />
+
+                </LinearLayout>
+
+                <!-- Nota para respuesta libre -->
+                <TextView
+                    android:id="@+id/tvFreeResponseHint"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:background="@drawable/bg_feedback_info"
+                    android:padding="14dp"
+                    android:text="@string/free_response_hint"
+                    android:textColor="@color/info_blue_dark"
+                    android:textSize="14sp"
+                    android:visibility="gone" />
+
+                <!-- Respuesta correcta / resultado -->
+                <TextView
+                    android:id="@+id/tvRespuestaCorrecta"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:background="@drawable/bg_feedback_success"
+                    android:padding="14dp"
+                    android:textColor="@color/success_green_dark"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:visibility="gone"
+                    android:text="Respuesta correcta" />
+
+                <!-- Explicación -->
+                <TextView
+                    android:id="@+id/tvExplicacion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/bg_feedback_info"
+                    android:padding="14dp"
+                    android:textColor="@color/info_blue_dark"
+                    android:textSize="14sp"
+                    android:visibility="gone"
+                    android:text="Explicación" />
+
+                <!-- Espaciador final para que el scroll no quede pegado a la barra inferior -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="12dp" />
+
+            </LinearLayout>
+
+        </androidx.core.widget.NestedScrollView>
+
+        <!-- Barra de acciones FIJA: siempre visible, sin importar el scroll -->
+        <LinearLayout
+            android:id="@+id/bottomActionBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_bottom_bar"
+            android:elevation="16dp"
+            android:orientation="vertical"
+            android:padding="20dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <!-- Botón Verificar (multiple choice / verdadero-falso) -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnVerificar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/brand_yellow"
+                android:paddingVertical="14dp"
+                android:text="@string/btn_verificar"
+                android:textAllCaps="true"
+                android:textColor="@color/brand_dark_blue"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:cornerRadius="26dp"
+                app:elevation="6dp" />
 
             <!-- Botones para respuesta libre -->
             <LinearLayout
                 android:id="@+id/llFreeResponseButtons"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
                 android:orientation="horizontal"
                 android:visibility="gone">
 
@@ -189,9 +413,11 @@
                     android:layout_marginEnd="8dp"
                     android:layout_weight="1"
                     android:backgroundTint="@color/success_green"
+                    android:paddingVertical="14dp"
                     android:text="@string/btn_correcto"
                     android:textColor="@color/white"
-                    app:cornerRadius="8dp" />
+                    android:textStyle="bold"
+                    app:cornerRadius="26dp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnIncorrecto"
@@ -200,25 +426,31 @@
                     android:layout_marginStart="8dp"
                     android:layout_weight="1"
                     android:backgroundTint="@color/error_red"
+                    android:paddingVertical="14dp"
                     android:text="@string/btn_incorrecto"
                     android:textColor="@color/white"
-                    app:cornerRadius="8dp" />
+                    android:textStyle="bold"
+                    app:cornerRadius="26dp" />
             </LinearLayout>
 
-            <!-- Botón Reiniciar -->
+            <!-- Botón Reiniciar / Girar de nuevo (aparece tras responder) -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnReiniciar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:backgroundTint="@color/brand_yellow"
+                android:backgroundTint="@color/brand_dark_blue"
+                android:paddingVertical="14dp"
                 android:text="@string/btn_reiniciar"
-                android:textColor="@color/brand_dark_blue"
+                android:textAllCaps="true"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold"
                 android:visibility="gone"
-                app:cornerRadius="8dp" />
+                app:cornerRadius="26dp"
+                app:elevation="6dp" />
 
         </LinearLayout>
 
-    </androidx.cardview.widget.CardView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</FrameLayout>
