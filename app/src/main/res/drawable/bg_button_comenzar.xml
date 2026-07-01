@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Fondo del botón "COMENZAR".
+    Forma "pill" (totalmente redondeada) con degradado amarillo para dar
+    sensación de profundidad y un look más moderno.
+    La sombra/elevación se aplica desde el layout con android:elevation
+    y outlineProvider="bounds" para que respete esta forma redondeada.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <gradient
+        android:type="linear"
+        android:angle="90"
+        android:startColor="@color/brand_yellow_light"
+        android:centerColor="@color/brand_yellow"
+        android:endColor="@color/brand_yellow_dark" />
+
+    <!-- Radio grande (mayor que la mitad de la altura del botón) = forma "pill" -->
+    <corners android:radius="32dp" />
+
+</shape>

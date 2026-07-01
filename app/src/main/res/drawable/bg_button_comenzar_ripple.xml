@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Envuelve el fondo del botón con un efecto ripple (ondas al tocar)
+    usando una versión ligeramente más oscura del azul de marca como color del ripple.
+-->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="#33060A51">
+
+    <item android:drawable="@drawable/bg_button_comenzar" />
+
+</ripple>

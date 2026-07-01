@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Fondo circular "medalla" para el logo:
+    - Círculo blanco de fondo (para que el logo resalte con elevación/sombra).
+    - Anillo exterior sutil en azul oscuro (marca).
+    - Anillo interior en amarillo dorado, más grueso, como acento principal.
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Círculo base blanco -->
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="@color/white" />
+        </shape>
+    </item>
+
+    <!-- Anillo exterior azul oscuro, muy fino -->
+    <item>
+        <shape android:shape="oval">
+            <stroke
+                android:width="1.5dp"
+                android:color="@color/brand_dark_blue_light" />
+            <solid android:color="@android:color/transparent" />
+        </shape>
+    </item>
+
+    <!-- Anillo interior amarillo, más grueso, ligeramente hacia adentro -->
+    <item
+        android:left="6dp"
+        android:top="6dp"
+        android:right="6dp"
+        android:bottom="6dp">
+        <shape android:shape="oval">
+            <stroke
+                android:width="3dp"
+                android:color="@color/brand_yellow" />
+            <solid android:color="@android:color/transparent" />
+        </shape>
+    </item>
+
+</layer-list>

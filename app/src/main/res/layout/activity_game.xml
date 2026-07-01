@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_primary">
+
+    <!-- Contenedor principal de la ruleta -->
+    <FrameLayout
+        android:id="@+id/ruletaContainer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="24dp"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.85">
+
+        <!-- Canvas para dibujar la ruleta -->
+        <com.nramos.ruletasolsecurity.custom.RuletaView
+            android:id="@+id/ruletaView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <!-- Indicador / flecha en la parte superior -->
+        <ImageView
+            android:id="@+id/ivIndicator"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="top|center_horizontal"
+            android:layout_marginTop="-12dp"
+            android:src="@drawable/ic_indicator"
+            android:contentDescription="@string/indicator_description" />
+
+        <!-- Centro de la ruleta (círculo decorativo) -->
+        <View
+            android:id="@+id/ruletaCenter"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:background="@drawable/bg_ruleta_center"
+            android:elevation="4dp" />
+
+    </FrameLayout>
+
+    <!-- Botón GIRAR -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnGirar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="48dp"
+        android:layout_marginEnd="48dp"
+        android:layout_marginTop="16dp"
+        android:backgroundTint="@color/brand_yellow"
+        android:elevation="8dp"
+        android:paddingVertical="16dp"
+        android:text="@string/btn_girar"
+        android:textAllCaps="true"
+        android:textColor="@color/brand_dark_blue"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:cornerRadius="30dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ruletaContainer" />
+
+    <!-- Card de la pregunta (se muestra después del giro) -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardPregunta"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="24dp"
+        android:visibility="gone"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="8dp"
+        app:cardBackgroundColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btnGirar">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <!-- Categoría -->
+            <TextView
+                android:id="@+id/tvCategoria"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/brand_dark_blue"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:text="Categoría" />
+
+            <!-- Número de pregunta -->
+            <TextView
+                android:id="@+id/tvNumeroPregunta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textColor="@color/brand_yellow"
+                android:textSize="12sp"
+                android:text="Pregunta #1" />
+
+            <!-- Texto de la pregunta -->
+            <TextView
+                android:id="@+id/tvPregunta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:textColor="@color/text_title"
+                android:textSize="16sp"
+                android:text="Texto de la pregunta" />
+
+            <!-- Opciones (para multiple choice) -->
+            <LinearLayout
+                android:id="@+id/llOpciones"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <RadioGroup
+                    android:id="@+id/rgOpciones"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <!-- Se llenará dinámicamente -->
+                </RadioGroup>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnVerificar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:backgroundTint="@color/brand_dark_blue"
+                    android:text="@string/btn_verificar"
+                    android:textColor="@color/white"
+                    app:cornerRadius="8dp" />
+            </LinearLayout>
+
+            <!-- Respuesta correcta / explicación -->
+            <TextView
+                android:id="@+id/tvRespuestaCorrecta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@color/success_green_light"
+                android:padding="12dp"
+                android:textColor="@color/success_green_dark"
+                android:textSize="14sp"
+                android:visibility="gone"
+                android:text="Respuesta correcta" />
+
+            <!-- Explicación -->
+            <TextView
+                android:id="@+id/tvExplicacion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@color/info_blue_light"
+                android:padding="12dp"
+                android:textColor="@color/info_blue_dark"
+                android:textSize="14sp"
+                android:visibility="gone"
+                android:text="Explicación" />
+
+            <!-- Botones para respuesta libre -->
+            <LinearLayout
+                android:id="@+id/llFreeResponseButtons"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnCorrecto"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    android:backgroundTint="@color/success_green"
+                    android:text="@string/btn_correcto"
+                    android:textColor="@color/white"
+                    app:cornerRadius="8dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnIncorrecto"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:backgroundTint="@color/error_red"
+                    android:text="@string/btn_incorrecto"
+                    android:textColor="@color/white"
+                    app:cornerRadius="8dp" />
+            </LinearLayout>
+
+            <!-- Botón Reiniciar -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnReiniciar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:backgroundTint="@color/brand_yellow"
+                android:text="@string/btn_reiniciar"
+                android:textColor="@color/brand_dark_blue"
+                android:visibility="gone"
+                app:cornerRadius="8dp" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

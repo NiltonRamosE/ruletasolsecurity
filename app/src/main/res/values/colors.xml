@@ -1,5 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- Colores base -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+
+    <!-- Colores de marca Sol Security -->
+    <color name="brand_yellow">#FAB323</color>
+    <color name="brand_yellow_light">#FFCB5C</color>
+    <color name="brand_yellow_dark">#E89A0C</color>
+    <color name="brand_dark_blue">#060A51</color>
+    <color name="brand_dark_blue_light">#1A2170</color>
+
+    <!-- Colores semánticos para la app -->
+    <color name="background_primary">#FFFFFF</color>
+    <color name="text_title">#060A51</color>
+    <color name="text_subtitle">#8A8FB8</color>
+    <color name="button_background">#FAB323</color>
+    <color name="button_text">#060A51</color>
+    <color name="button_shadow">#33060A51</color>
+
+    <!-- Formas decorativas de fondo (baja opacidad) -->
+    <color name="decorative_yellow">#1FFAB323</color>
+    <color name="decorative_blue">#14060A51</color>
+
+    <!-- Badge / etiqueta superior -->
+    <color name="badge_background">#0DFAB323</color>
+    <color name="badge_border">#FAB323</color>
+    <color name="badge_text">#060A51</color>
+
+    <!-- Anillo del logo -->
+    <color name="logo_ring">#FAB323</color>
+
+    <!-- Colores de feedback -->
+    <color name="success_green">#4CAF50</color>
+    <color name="success_green_light">#E8F5E9</color>
+    <color name="success_green_dark">#2E7D32</color>
+    <color name="error_red">#F44336</color>
+    <color name="error_red_light">#FFEBEE</color>
+    <color name="error_red_dark">#C62828</color>
+    <color name="info_blue_light">#E3F2FD</color>
+    <color name="info_blue_dark">#1565C0</color>
 </resources>
