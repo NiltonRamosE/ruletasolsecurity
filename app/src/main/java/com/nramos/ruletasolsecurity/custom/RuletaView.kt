@@ -12,15 +12,11 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.animation.DecelerateInterpolator
 import com.nramos.ruletasolsecurity.data.Category
-import com.nramos.ruletasolsecurity.data.QuestionData
 import kotlin.math.cos
+import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sin
 
-/**
- * Vista personalizada que dibuja la ruleta de categorías.
- * Estilo gráfico circular limpio, sin triángulos en el centro.
- */
 class RuletaView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -31,14 +27,11 @@ class RuletaView @JvmOverloads constructor(
         private const val PI = Math.PI.toFloat()
         private const val TWO_PI = PI * 2
 
-        // Colores de sector
         private val SECTOR_COLORS = listOf(
-            Color.parseColor("#FAB323"), // A - amarillo dorado
-            Color.parseColor("#9BC1BC"), // B - azul oscuro
-            Color.parseColor("#1A2170")  // C - azul medio
+            Color.parseColor("#FAB323"),
+            Color.parseColor("#9BC1BC"),
+            Color.parseColor("#1A2170")
         )
-
-        private val SECTOR_LETTERS = listOf("A", "B", "C")
     }
 
     private var categories: List<Category> = emptyList()
@@ -83,14 +76,13 @@ class RuletaView @JvmOverloads constructor(
     private var isSpinning = false
 
     init {
-        categories = QuestionData.getCategories()
         setLayerType(LAYER_TYPE_SOFTWARE, null)
     }
 
-    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
-        super.onSizeChanged(w, h, oldw, oldh)
-        letterPaint.textSize = width * 0.16f
-        ringPaint.strokeWidth = width * 0.02f
+    // ✅ MÉTODO PARA ACTUALIZAR CATEGORÍAS
+    fun setCategories(categories: List<Category>) {
+        this.categories = categories
+        invalidate() // Redibujar la ruleta
     }
 
     fun setOnCategorySelectedListener(listener: (Category) -> Unit) {
@@ -98,7 +90,12 @@ class RuletaView @JvmOverloads constructor(
     }
 
     fun spin() {
-        if (isSpinning || categories.isEmpty()) return
+        if (isSpinning || categories.isEmpty()) {
+            if (categories.isEmpty()) {
+                android.util.Log.e("RuletaView", "No hay categorías para girar")
+            }
+            return
+        }
         isSpinning = true
 
         val extraAngle = (Math.random() * TWO_PI).toFloat()
@@ -117,6 +114,7 @@ class RuletaView @JvmOverloads constructor(
                     isSpinning = false
                     selectedIndex = getSelectedCategoryIndex()
                     if (selectedIndex in categories.indices) {
+                        android.util.Log.d("RuletaView", "Categoría seleccionada: ${categories[selectedIndex].name}")
                         onCategorySelected?.invoke(categories[selectedIndex])
                     }
                 }
@@ -138,8 +136,14 @@ class RuletaView @JvmOverloads constructor(
         val indicatorAngle = -PI / 2
         val angle = (indicatorAngle - currentRotation) % TWO_PI
         val normalizedAngle = if (angle < 0) angle + TWO_PI else angle
-        val sectorAngle = TWO_PI / categories.size
-        return (normalizedAngle / sectorAngle).toInt() % categories.size
+        val sectorAngle = TWO_PI / max(categories.size, 1)
+        return (normalizedAngle / sectorAngle).toInt() % max(categories.size, 1)
+    }
+
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        letterPaint.textSize = width * 0.16f
+        ringPaint.strokeWidth = width * 0.02f
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -148,8 +152,6 @@ class RuletaView @JvmOverloads constructor(
         val centerX = width / 2f
         val centerY = height / 2f
         val radius = (min(width, height) / 2f) * 0.88f
-
-        // Espacio para el centro limpio (20% del radio)
         val innerRadius = radius * 0.28f
 
         if (categories.isEmpty()) {
@@ -157,12 +159,9 @@ class RuletaView @JvmOverloads constructor(
             return
         }
 
-        // Sombra suave
         sectorPaint.setShadowLayer(18f, 0f, 8f, Color.parseColor("#33000000"))
-
         val sectorAngle = TWO_PI / categories.size
 
-        // Rectángulo para los arcos (desde innerRadius hasta radius)
         val rectF = RectF(
             centerX - radius,
             centerY - radius,
@@ -170,29 +169,18 @@ class RuletaView @JvmOverloads constructor(
             centerY + radius
         )
 
-        val innerRectF = RectF(
-            centerX - innerRadius,
-            centerY - innerRadius,
-            centerX + innerRadius,
-            centerY + innerRadius
-        )
-
+        // Dibujar sectores
         for (i in categories.indices) {
             val startAngle = Math.toDegrees((i * sectorAngle + currentRotation).toDouble()).toFloat()
             val sweepAngle = Math.toDegrees(sectorAngle.toDouble()).toFloat()
 
-            // Dibujar el sector como un arco (sin llegar al centro)
             sectorPaint.color = SECTOR_COLORS[i % SECTOR_COLORS.size]
             canvas.drawArc(rectF, startAngle, sweepAngle, true, sectorPaint)
-
-            // Dibujar un círculo interior blanco para ocultar las puntas
-            // Esto se hace después para que el centro quede limpio
         }
 
-        // Quitar la sombra para el resto de dibujos
         sectorPaint.clearShadowLayer()
 
-        // Dibujar separadores blancos entre sectores (líneas desde innerRadius hasta radius)
+        // Separadores
         for (i in categories.indices) {
             val angle = i * sectorAngle + currentRotation
             val startX = centerX + innerRadius * cos(angle)
@@ -202,20 +190,19 @@ class RuletaView @JvmOverloads constructor(
             canvas.drawLine(startX, startY, endX, endY, borderPaint)
         }
 
-        // Dibujar letras en cada sector
+        // Letras
+        val letters = listOf("A", "B", "C")
         for (i in categories.indices) {
             val midAngle = (i * sectorAngle + currentRotation) + sectorAngle / 2
             val textRadius = (innerRadius + radius) / 2
             val textX = centerX + textRadius * cos(midAngle)
             val textY = centerY + textRadius * sin(midAngle)
 
-            val letter = SECTOR_LETTERS.getOrElse(i) { (i + 1).toString() }
-
-            // Color de la letra según el fondo
+            val letter = letters.getOrElse(i) { (i + 1).toString() }
             letterPaint.color = if (i == 0) {
-                Color.parseColor("#060A51") // Amarillo → texto oscuro
+                Color.parseColor("#060A51")
             } else {
-                Color.WHITE // Azul → texto blanco
+                Color.WHITE
             }
 
             canvas.drawText(
@@ -226,14 +213,9 @@ class RuletaView @JvmOverloads constructor(
             )
         }
 
-        // 🔹 CENTRO LIMPIO - SIN TRIÁNGULOS 🔹
-        // Dibujar un círculo blanco en el centro que cubre todas las puntas
+        // Centro
         canvas.drawCircle(centerX, centerY, innerRadius, centerPaint)
-
-        // Anillo interior decorativo
         canvas.drawCircle(centerX, centerY, innerRadius, centerRingPaint)
-
-        // Anillo exterior
         canvas.drawCircle(centerX, centerY, radius, ringPaint)
     }
 
@@ -243,7 +225,7 @@ class RuletaView @JvmOverloads constructor(
         canvas.drawCircle(centerX, centerY, min(width, height) / 3f, sectorPaint)
         letterPaint.textSize = 24f
         letterPaint.color = Color.GRAY
-        canvas.drawText("Sin datos", centerX, centerY + 8f, letterPaint)
+        canvas.drawText("Cargando...", centerX, centerY + 8f, letterPaint)
     }
 
     fun getSelectedCategory(): Category? {

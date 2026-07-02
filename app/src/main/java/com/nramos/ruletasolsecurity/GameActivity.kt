@@ -7,24 +7,18 @@ import android.widget.RadioButton
 import android.widget.RadioGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
 import com.nramos.ruletasolsecurity.data.Category
 import com.nramos.ruletasolsecurity.data.Question
 import com.nramos.ruletasolsecurity.data.QuestionType
 import com.nramos.ruletasolsecurity.databinding.ActivityGameBinding
+import com.nramos.ruletasolsecurity.viewmodel.RuletaViewModel
 
-/**
- * Pantalla del juego.
- *
- * Tiene dos "secciones" dentro de un mismo layout, mutuamente excluyentes:
- * - [ActivityGameBinding.wheelSection]: la ruleta con el botón GIRAR.
- * - [ActivityGameBinding.questionSection]: la pregunta a pantalla completa,
- *   con contenido scrollable y una barra de acciones fija en la parte
- *   inferior (siempre visible, sin importar cuánto scroll haya).
- */
 class GameActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityGameBinding
+    private lateinit var viewModel: RuletaViewModel
 
     private var currentCategory: Category? = null
     private var currentQuestion: Question? = null
@@ -35,16 +29,57 @@ class GameActivity : AppCompatActivity() {
         binding = ActivityGameBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        viewModel = ViewModelProvider(this)[RuletaViewModel::class.java]
+
+        setupObservers()
         setupRuleta()
         setupButtons()
+
+        // Cargar datos si no están disponibles
+        if (viewModel.categories.value.isNullOrEmpty()) {
+            viewModel.loadCategories()
+        } else {
+            // Si ya hay datos, pasarlos a la ruleta
+            viewModel.categories.value?.let { categories ->
+                if (categories.isNotEmpty()) {
+                    binding.ruletaView.setCategories(categories)
+                }
+            }
+        }
     }
 
-    // ============================================================
-    // Configuración inicial
-    // ============================================================
+    private fun setupObservers() {
+        viewModel.categories.observe(this) { categories ->
+            if (categories.isNotEmpty()) {
+                android.util.Log.d("GameActivity", "Categorías recibidas: ${categories.size}")
+                binding.ruletaView.setCategories(categories)
+                binding.btnGirar.isEnabled = true
+                binding.tvBtnGirarLabel.text = getString(R.string.btn_girar)
+            }
+        }
+
+        viewModel.isLoading.observe(this) { isLoading ->
+            if (isLoading) {
+                binding.tvBtnGirarLabel.text = "CARGANDO..."
+                binding.btnGirar.isEnabled = false
+            } else {
+                binding.btnGirar.isEnabled = true
+                binding.tvBtnGirarLabel.text = getString(R.string.btn_girar)
+            }
+        }
+
+        viewModel.error.observe(this) { error ->
+            error?.let {
+                Snackbar.make(binding.root, "Error: $it", Snackbar.LENGTH_LONG).show()
+                binding.btnGirar.isEnabled = true
+                binding.tvBtnGirarLabel.text = getString(R.string.btn_girar)
+            }
+        }
+    }
 
     private fun setupRuleta() {
         binding.ruletaView.setOnCategorySelectedListener { category ->
+            android.util.Log.d("GameActivity", "Categoría seleccionada: ${category.name}")
             currentCategory = category
             showQuestionForCategory(category)
         }
@@ -53,13 +88,22 @@ class GameActivity : AppCompatActivity() {
     private fun setupButtons() {
         binding.btnGirar.setOnClickListener {
             if (!binding.ruletaView.isSpinning()) {
+                val categories = viewModel.categories.value
+                if (categories.isNullOrEmpty()) {
+                    Snackbar.make(binding.root, "Cargando datos...", Snackbar.LENGTH_SHORT).show()
+                    viewModel.loadCategories()
+                    return@setOnClickListener
+                }
+                if (categories.size < 3) {
+                    Snackbar.make(binding.root, "Faltan categorías", Snackbar.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
                 startSpinUi()
                 binding.ruletaView.spin()
                 animateButtonPress()
             }
         }
 
-        // El botón "X" en la pantalla de pregunta regresa a la ruleta.
         binding.btnClose.setOnClickListener {
             returnToWheel()
         }
@@ -74,10 +118,6 @@ class GameActivity : AppCompatActivity() {
         animator.duration = 300
         animator.start()
     }
-
-    // ============================================================
-    // Transición entre la ruleta y la pregunta a pantalla completa
-    // ============================================================
 
     private fun startSpinUi() {
         binding.btnGirar.isEnabled = false
@@ -101,7 +141,6 @@ class GameActivity : AppCompatActivity() {
         binding.btnGirar.isEnabled = true
         binding.tvBtnGirarLabel.text = getString(R.string.btn_girar)
 
-        // Limpiar estado de la pregunta anterior para la próxima vez.
         binding.rgOpciones.removeAllViews()
         binding.rgOpciones.clearCheck()
         binding.btnVerificar.isEnabled = true
@@ -109,12 +148,7 @@ class GameActivity : AppCompatActivity() {
         binding.btnIncorrecto.isEnabled = true
     }
 
-    // ============================================================
-    // Mostrar la pregunta
-    // ============================================================
-
     private fun showQuestionForCategory(category: Category) {
-        // Restaurar el botón GIRAR para la próxima vuelta (aunque esté oculto ahora).
         binding.btnGirar.isEnabled = true
         binding.tvBtnGirarLabel.text = getString(R.string.btn_girar)
 
@@ -135,7 +169,6 @@ class GameActivity : AppCompatActivity() {
         binding.tvNumeroPregunta.text = "Pregunta #${question.id}"
         binding.tvPregunta.text = question.text
 
-        // Reset de visibilidad de todos los bloques dinámicos.
         binding.llOpciones.visibility = View.GONE
         binding.tvFreeResponseHint.visibility = View.GONE
         binding.tvRespuestaCorrecta.visibility = View.GONE
@@ -178,7 +211,7 @@ class GameActivity : AppCompatActivity() {
 
         val radioGroup = binding.rgOpciones
         radioGroup.removeAllViews()
-        question.options?.forEach { option ->
+        question.options.forEach { option ->
             radioGroup.addView(buildOptionRadioButton(option))
         }
 
@@ -190,7 +223,7 @@ class GameActivity : AppCompatActivity() {
 
         val radioGroup = binding.rgOpciones
         radioGroup.removeAllViews()
-        question.options?.forEach { option ->
+        question.options.forEach { option ->
             radioGroup.addView(buildOptionRadioButton(option))
         }
 
@@ -203,10 +236,6 @@ class GameActivity : AppCompatActivity() {
         binding.llFreeResponseButtons.visibility = View.VISIBLE
     }
 
-    // ============================================================
-    // Verificación de respuestas
-    // ============================================================
-
     private fun verifyMultipleChoice(question: Question) {
         if (isAnswering) return
         val selectedId = binding.rgOpciones.checkedRadioButtonId
@@ -216,7 +245,7 @@ class GameActivity : AppCompatActivity() {
         }
         isAnswering = true
         val selectedText = findViewById<RadioButton>(selectedId).text.toString()
-        val isCorrect = selectedText.startsWith(question.correctAnswer)
+        val isCorrect = selectedText == question.correctAnswer
         showAnswerResult(isCorrect, question)
     }
 
@@ -261,12 +290,10 @@ class GameActivity : AppCompatActivity() {
             binding.tvExplicacion.text = it
         }
 
-        // Ocultar los controles de respuesta y mostrar la acción para continuar.
         binding.btnVerificar.visibility = View.GONE
         binding.llFreeResponseButtons.visibility = View.GONE
         binding.btnReiniciar.visibility = View.VISIBLE
 
-        // Desplazar el scroll para que el resultado quede visible de inmediato.
         binding.scrollQuestion.post {
             binding.scrollQuestion.smoothScrollTo(0, binding.tvRespuestaCorrecta.top)
         }
