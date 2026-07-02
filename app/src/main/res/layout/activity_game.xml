@@ -14,12 +14,25 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <!-- ====== LOGO EN LA PARTE SUPERIOR ====== -->
+        <ImageView
+            android:id="@+id/ivLogoHeader"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="20dp"
+            android:src="@drawable/sol_security_logo_2"
+            android:contentDescription="@string/logo_content_description"
+            android:scaleType="centerInside"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <!-- Título de la pantalla -->
         <TextView
             android:id="@+id/tvWheelTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
+            android:layout_marginTop="8dp"
             android:layout_marginStart="24dp"
             android:layout_marginEnd="24dp"
             android:gravity="center"
@@ -30,7 +43,7 @@
             android:fontFamily="sans-serif-black"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/ivLogoHeader" />
 
         <TextView
             android:id="@+id/tvWheelSubtitle"
@@ -225,19 +238,32 @@
         android:visibility="gone"
         tools:visibility="visible">
 
+        <!-- ====== LOGO EN LA PARTE SUPERIOR DE PREGUNTAS ====== -->
+        <ImageView
+            android:id="@+id/ivLogoHeaderQuestion"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginTop="16dp"
+            android:src="@drawable/sol_security_logo_2"
+            android:contentDescription="@string/logo_content_description"
+            android:scaleType="centerInside"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <!-- Barra superior: cerrar + categoría -->
         <ImageButton
             android:id="@+id/btnClose"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="14dp"
             android:layout_marginStart="20dp"
             android:background="@drawable/bg_close_button"
             android:contentDescription="@string/close_description"
             android:padding="10dp"
             android:src="@drawable/ic_close"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/ivLogoHeaderQuestion" />
 
         <TextView
             android:id="@+id/tvCategoria"
@@ -262,7 +288,7 @@
             android:id="@+id/scrollQuestion"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="16dp"
             android:clipToPadding="false"
             android:paddingBottom="16dp"
             app:layout_constraintBottom_toTopOf="@id/bottomActionBar"
