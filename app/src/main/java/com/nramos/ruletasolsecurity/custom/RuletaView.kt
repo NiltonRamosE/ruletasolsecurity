@@ -142,7 +142,7 @@ class RuletaView @JvmOverloads constructor(
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
-        letterPaint.textSize = width * 0.16f
+        letterPaint.textSize = width * 0.22f
         ringPaint.strokeWidth = width * 0.02f
     }
 
@@ -219,13 +219,17 @@ class RuletaView @JvmOverloads constructor(
         canvas.drawCircle(centerX, centerY, radius, ringPaint)
     }
 
+    private val emptyStatePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        textAlign = Paint.Align.CENTER
+        color = Color.GRAY
+        textSize = 24f
+    }
+
     private fun drawEmptyState(canvas: Canvas, centerX: Float, centerY: Float) {
         sectorPaint.color = Color.LTGRAY
         sectorPaint.style = Paint.Style.FILL
         canvas.drawCircle(centerX, centerY, min(width, height) / 3f, sectorPaint)
-        letterPaint.textSize = 24f
-        letterPaint.color = Color.GRAY
-        canvas.drawText("Cargando...", centerX, centerY + 8f, letterPaint)
+        canvas.drawText("Cargando...", centerX, centerY + 8f, emptyStatePaint)
     }
 
     fun getSelectedCategory(): Category? {
